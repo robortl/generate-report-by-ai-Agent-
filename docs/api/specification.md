@@ -1,0 +1,376 @@
+# API Specification
+# API仕様書
+# API规范
+
+## Overview
+## 概要
+## 概述
+
+This document specifies the RESTful API interface for the Report Generation System. All API endpoints are prefixed with `/api`.
+
+## Base Information
+## 基本情報
+## 基本信息
+
+- **Base URL**: `/api`
+- **Content Type**: `application/json`
+- **Character Encoding**: UTF-8
+- **Version**: v1
+- **Authentication**: API Key or JWT Token (planned)
+
+## Common Response Format
+## 共通レスポンス形式
+## 通用响应格式
+
+### Success Response
+### 成功レスポンス
+### 成功响应
+
+```json
+{
+  "data": {
+    // Response data
+  },
+  "message": "Success message",
+  "timestamp": "2024-03-07T12:00:00Z"
+}
+```
+
+### Error Response
+### エラーレスポンス
+### 错误响应
+
+```json
+{
+  "error": {
+    "code": "ERROR_CODE",
+    "message": "Error description",
+    "details": {
+      // Additional error details
+    }
+  },
+  "timestamp": "2024-03-07T12:00:00Z"
+}
+```
+
+## API Endpoints
+## APIエンドポイント
+## API端点
+
+### 1. File Management
+### 1. ファイル管理
+### 1. 文件管理
+
+#### 1.1 Upload File
+#### 1.1 ファイルアップロード
+#### 1.1 上传文件
+
+**Endpoint**: `POST /api/files/upload`
+
+**Content-Type**: `multipart/form-data`
+
+**Request Parameters**:
+| Name | Type | Required | Description |
+|------|------|----------|-------------|
+| file | File | Yes | File to upload |
+| category | String | No | File category |
+
+**Success Response** (201):
+```json
+{
+  "data": {
+    "file_id": "550e8400-e29b-41d4-a716-446655440000",
+    "s3_url": "https://bucket-name.s3.region.amazonaws.com/path/to/file",
+    "category": "meeting"
+  },
+  "message": "File uploaded successfully"
+}
+```
+
+#### 1.2 Get File Categories
+#### 1.2 ファイルカテゴリー取得
+#### 1.2 获取文件类别
+
+**Endpoint**: `GET /api/files/categories`
+
+**Success Response** (200):
+```json
+{
+  "data": [
+    {
+      "id": "meeting",
+      "name": "Meeting Minutes"
+    },
+    {
+      "id": "report",
+      "name": "Business Report"
+    }
+  ]
+}
+```
+
+#### 1.3 Get File List
+#### 1.3 ファイル一覧取得
+#### 1.3 获取文件列表
+
+**Endpoint**: `GET /api/files`
+
+**Query Parameters**:
+| Name | Type | Required | Description |
+|------|------|----------|-------------|
+| category | String | No | Filter by category |
+| limit | Integer | No | Items per page |
+| last_key | String | No | Pagination token |
+
+**Success Response** (200):
+```json
+{
+  "data": {
+    "items": [
+      {
+        "file_id": "550e8400-e29b-41d4-a716-446655440000",
+        "original_filename": "meeting_minutes.txt",
+        "category": "meeting",
+        "s3_url": "https://bucket-name.s3.region.amazonaws.com/path/to/file",
+        "status": "uploaded",
+        "upload_time": "2024-03-07T12:00:00Z"
+      }
+    ],
+    "last_evaluated_key": "pagination-token"
+  }
+}
+```
+
+### 2. Report Generation
+### 2. レポート生成
+### 2. 报告生成
+
+#### 2.1 Generate Report
+#### 2.1 レポート生成
+#### 2.1 生成报告
+
+**Endpoint**: `POST /api/reports`
+
+**Request Body**:
+```json
+{
+  "file_id": "550e8400-e29b-41d4-a716-446655440000",
+  "prompt": "Generate a detailed meeting summary",
+  "model_id": "anthropic.claude-v2"
+}
+```
+
+**Success Response** (201):
+```json
+{
+  "data": {
+    "report_id": "660e8400-e29b-41d4-a716-446655440000",
+    "status": "processing"
+  },
+  "message": "Report generation started"
+}
+```
+
+#### 2.2 Get Report
+#### 2.2 レポート取得
+#### 2.2 获取报告
+
+**Endpoint**: `GET /api/reports/{report_id}`
+
+**Success Response** (200):
+```json
+{
+  "data": {
+    "report_id": "660e8400-e29b-41d4-a716-446655440000",
+    "file_id": "550e8400-e29b-41d4-a716-446655440000",
+    "content": "# Meeting Summary\n\n## Main Points\n...",
+    "model_id": "anthropic.claude-v2",
+    "prompt": "Generate a detailed meeting summary",
+    "created_at": "2024-03-07T12:30:00Z",
+    "updated_at": "2024-03-07T12:30:00Z"
+  }
+}
+```
+
+#### 2.3 Update Report
+#### 2.3 レポート更新
+#### 2.3 更新报告
+
+**Endpoint**: `PUT /api/reports/{report_id}`
+
+**Request Body**:
+```json
+{
+  "content": "# Updated Meeting Summary\n\n## Main Points\n..."
+}
+```
+
+**Success Response** (200):
+```json
+{
+  "data": {
+    "report_id": "660e8400-e29b-41d4-a716-446655440000",
+    "updated_at": "2024-03-07T12:35:00Z"
+  },
+  "message": "Report updated successfully"
+}
+```
+
+### 3. Model Management
+### 3. モデル管理
+### 3. 模型管理
+
+#### 3.1 Get Available Models
+#### 3.1 利用可能なモデル取得
+#### 3.1 获取可用模型
+
+**Endpoint**: `GET /api/models`
+
+**Success Response** (200):
+```json
+{
+  "data": [
+    {
+      "id": "anthropic.claude-v2",
+      "name": "Claude 2",
+      "provider": "Anthropic",
+      "description": "Powerful general-purpose AI assistant",
+      "capabilities": ["Text Analysis", "Report Generation"]
+    }
+  ]
+}
+```
+
+#### 3.2 Compare Models
+#### 3.2 モデル比較
+#### 3.2 比较模型
+
+**Endpoint**: `POST /api/models/compare`
+
+**Request Body**:
+```json
+{
+  "file_id": "550e8400-e29b-41d4-a716-446655440000",
+  "model_ids": ["anthropic.claude-v2", "amazon.titan-text-express-v1"],
+  "prompt": "Generate a meeting summary"
+}
+```
+
+**Success Response** (200):
+```json
+{
+  "data": {
+    "comparison_id": "770e8400-e29b-41d4-a716-446655440000",
+    "results": [
+      {
+        "model_id": "anthropic.claude-v2",
+        "content": "Content generated by Claude...",
+        "metrics": {
+          "processing_time": 2.5,
+          "token_count": 1500
+        }
+      }
+    ]
+  }
+}
+```
+
+#### 3.3 Extract Keywords
+#### 3.3 キーワード抽出
+#### 3.3 提取关键词
+
+**Endpoint**: `POST /api/models/semantic/keywords`
+
+**Request Body**:
+```json
+{
+  "file_id": "550e8400-e29b-41d4-a716-446655440000",
+  "top_n": 10
+}
+```
+
+**Success Response** (200):
+```json
+{
+  "data": {
+    "keywords": [
+      "Product Roadmap",
+      "Data Export",
+      "Mobile Optimization"
+    ]
+  }
+}
+```
+
+#### 3.4 Process Structured Data
+#### 3.4 構造化データ処理
+#### 3.4 处理结构化数据
+
+**Endpoint**: `POST /api/models/semantic/structure`
+
+**Request Body**:
+```json
+{
+  "file_id": "550e8400-e29b-41d4-a716-446655440000",
+  "schema": {
+    "title": "Title",
+    "date": "Date",
+    "participants": "Participants",
+    "agenda": "Agenda",
+    "decisions": "Decisions",
+    "action_items": "Action Items"
+  }
+}
+```
+
+**Success Response** (200):
+```json
+{
+  "data": {
+    "structured_data": {
+      "title": "Product Development Strategy Meeting",
+      "date": "2024-03-07",
+      "participants": ["John Doe", "Jane Smith"],
+      "agenda": ["Follow-up", "Q2 Roadmap"],
+      "decisions": ["Prioritize Data Export"],
+      "action_items": [
+        {
+          "item": "Complete User Interviews",
+          "assignee": "Jane Smith",
+          "deadline": "2024-03-15"
+        }
+      ]
+    }
+  }
+}
+```
+
+## Error Codes
+## エラーコード
+## 错误代码
+
+| Code | Description |
+|------|-------------|
+| INVALID_PARAMETERS | Invalid request parameters |
+| FILE_NOT_FOUND | Requested file not found |
+| REPORT_NOT_FOUND | Requested report not found |
+| MODEL_NOT_FOUND | Requested model not found |
+| PROCESSING_ERROR | Error during report generation |
+| UNAUTHORIZED | Authentication required |
+| FORBIDDEN | Insufficient permissions |
+| INTERNAL_ERROR | Server internal error |
+
+## Rate Limiting
+## レート制限
+## 速率限制
+
+- 100 requests per minute per API key
+- 1000 requests per hour per API key
+
+## Versioning
+## バージョニング
+## 版本控制
+
+- Current version: v1
+- Version is specified in URL: `/api/v1/...`
+- Breaking changes will be released in new versions 

@@ -1,0 +1,52 @@
+{
+  "GET health": {
+    "endpoint": "GET health",
+    "iterations": 20,
+    "success_count": 20,
+    "avg_time": 8.925771713256836,
+    "min_time": 5.988121032714844,
+    "max_time": 13.677597045898438,
+    "median_time": 8.931398391723633,
+    "p95_time": 13.677597045898438
+  },
+  "GET upload/categories": {
+    "endpoint": "GET upload/categories",
+    "iterations": 20,
+    "success_count": 20,
+    "avg_time": 9.285342693328857,
+    "min_time": 7.000923156738281,
+    "max_time": 14.190435409545898,
+    "median_time": 8.892536163330078,
+    "p95_time": 14.190435409545898
+  },
+  "GET files?limit=10": {
+    "endpoint": "GET files?limit=10",
+    "iterations": 20,
+    "success_count": 20,
+    "avg_time": 228.84331941604614,
+    "min_time": 123.84176254272461,
+    "max_time": 433.380126953125,
+    "median_time": 202.30674743652344,
+    "p95_time": 433.380126953125
+  },
+  "GET upload/categories (并发)": {
+    "endpoint": "GET upload/categories (并发)",
+    "concurrent": 20,
+    "success_count": 20,
+    "avg_time": 33.80180597305298,
+    "min_time": 16.132116317749023,
+    "max_time": 49.576759338378906,
+    "median_time": 34.62362289428711,
+    "p95_time": 49.576759338378906
+  },
+  "GET files?limit=10 (并发)": {
+    "endpoint": "GET files?limit=10 (并发)",
+    "concurrent": 20,
+    "success_count": 20,
+    "avg_time": 1055.8178424835205,
+    "min_time": 820.9717273712158,
+    "max_time": 1355.9203147888184,
+    "median_time": 1041.8734550476074,
+    "p95_time": 1355.9203147888184
+  }
+}

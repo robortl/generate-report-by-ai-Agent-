@@ -1,0 +1,19 @@
+{
+    "Version": "2012-10-17",
+    "Statement": [
+        {
+            "Effect": "Allow",
+            "Action": [
+                "bedrock:*",
+                "bedrock-agent:*",
+                "bedrock-agent-runtime:*",
+                "bedrock-runtime:*",
+                "bedrock:InvokeModel",
+                "bedrock:InvokeModelWithResponseStream",
+                "bedrock-runtime:InvokeModel",
+                "bedrock-runtime:InvokeModelWithResponseStream"
+            ],
+            "Resource": "*"
+        }
+    ]
+} 

@@ -1,0 +1,22 @@
+{
+  "rules": [
+    {
+      "name": "测试文件应放在tests目录中",
+      "pattern": "test_*.py",
+      "exclude": ["**/tests/**", "**/tests.py"],
+      "message": "测试文件应放在tests目录中，请将此文件移动到适当的tests子目录"
+    },
+    {
+      "name": "后端测试文件应放在backend/tests目录中",
+      "pattern": "backend/test_*.py",
+      "exclude": ["backend/tests/**", "backend/run_tests.py"],
+      "message": "后端测试文件应放在backend/tests目录中，请将此文件移动到适当的tests子目录"
+    },
+    {
+      "name": "前端测试文件应放在frontend/tests目录中",
+      "pattern": "frontend/test_*.py",
+      "exclude": ["frontend/tests/**"],
+      "message": "前端测试文件应放在frontend/tests目录中，请将此文件移动到适当的tests子目录"
+    }
+  ]
+} 

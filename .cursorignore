@@ -1,0 +1,29 @@
+# 忽略测试目录外的测试文件
+/backend/test_*.py
+/frontend/test_*.py
+/test_*.py
+
+# 忽略构建目录
+/build/
+/dist/
+/node_modules/
+/.venv/
+/__pycache__/
+*.pyc
+*.pyo
+*.pyd
+.Python
+env/
+venv/
+ENV/
+env.bak/
+venv.bak/
+
+# 忽略覆盖率报告
+/coverage/
+/coverage_html/
+/.coverage
+/htmlcov/
+
+# 忽略日志文件
+*.log 

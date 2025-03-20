@@ -1,0 +1,133 @@
+{
+  "deployment_date": "2025-03-05",
+  "deployment_status": "success",
+  "resources": {
+    "iam": {
+      "roles": {
+        "report-lambda-execution-role": {
+          "status": "deployed",
+          "arn": "arn:aws:iam::458532992416:role/report-lambda-execution-role"
+        }
+      }
+    },
+    "s3": {
+      "buckets": {
+        "report-langchain-haystack-files": {
+          "status": "deployed",
+          "folders": [
+            "uploads",
+            "reports",
+            "temp",
+            "models"
+          ],
+          "cors_enabled": true,
+          "cors_origins": [
+            "http://localhost:3000"
+          ]
+        }
+      }
+    },
+    "dynamodb": {
+      "tables": {
+        "report_files": {
+          "status": "deployed"
+        },
+        "report_reports": {
+          "status": "deployed"
+        },
+        "report_models": {
+          "status": "deployed"
+        }
+      }
+    },
+    "lambda": {
+      "functions": {
+        "report_generator": {
+          "status": "deployed",
+          "runtime": "python3.9",
+          "memory_size": 1024,
+          "timeout": 300,
+          "dependencies": [
+            "boto3",
+            "langchain==0.0.267",
+            "farm-haystack==1.20.0"
+          ]
+        },
+        "keyword_extractor": {
+          "status": "not_deployed",
+          "reason": "source_code_missing"
+        },
+        "model_comparator": {
+          "status": "not_deployed",
+          "reason": "source_code_missing"
+        }
+      }
+    },
+    "bedrock": {
+      "models": {
+        "amazon.titan-text-express-v1": {
+          "status": "available",
+          "display_name": "Amazon: Titan Text G1 - Express"
+        }
+      },
+      "agents": {
+        "report-generator-agent": {
+          "status": "already_exists",
+          "agent_id": "LPJVAYJAK2"
+        }
+      },
+      "save_to_dynamodb_status": "failed",
+      "save_to_dynamodb_error": "Missing the key model_id in the item"
+    }
+  },
+  "issues_resolved": [
+    {
+      "issue": "lambda_environment_variables",
+      "description": "修复了使用AWS保留键名AWS_REGION的问题",
+      "solution": "使用自定义名称APP_AWS_REGION替代"
+    },
+    {
+      "issue": "lambda_deployment_script",
+      "description": "Lambda部署脚本优化",
+      "solution": "修改脚本只部署已经存在源代码目录的函数"
+    },
+    {
+      "issue": "lambda_update_conflict",
+      "description": "Lambda函数更新冲突",
+      "solution": "添加重试机制，解决Lambda函数更新冲突的问题"
+    }
+  ],
+  "pending_tasks": [
+    "开发缺失的Lambda函数: keyword_extractor",
+    "开发缺失的Lambda函数: model_comparator",
+    "部署Bedrock Agent并配置知识库和操作组",
+    "修复Bedrock模型信息保存到DynamoDB的问题",
+    "考虑申请更多Bedrock模型的访问权限"
+  ],
+  "environment": {
+    "aws_region": "ap-northeast-1",
+    "aws_profile": "default",
+    "s3_bucket_name": "report-langchain-haystack-files",
+    "dynamodb_table_prefix": "report_"
+  },
+  "bedrock": {
+    "agent": {
+      "id": "LPJVAYJAK2",
+      "name": "report-generator-agent",
+      "status": "exists",
+      "timestamp": "2025-03-06T10:51:15.530445"
+    },
+    "knowledge_base": {
+      "status": "skipped",
+      "message": "知识库创建已跳过",
+      "timestamp": "2025-03-06T10:51:15.530452"
+    },
+    "action_group": {
+      "id": null,
+      "name": null,
+      "status": "error",
+      "timestamp": "2025-03-06T10:51:15.530454",
+      "error": "An error occurred (ConflictException) when calling the CreateAgentActionGroup operation: Could not perform Create operation, since the report-generator-agent-action-group (id: Q32EEHM64G) with the same name report-generator-agent-action-group already exists"
+    }
+  }
+}

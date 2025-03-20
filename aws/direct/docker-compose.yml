@@ -1,0 +1,96 @@
+version: '3.8'
+
+services:
+  # 前端应用
+  frontend:
+    container_name: report-frontend
+    build:
+      context: ../../frontend
+      dockerfile: Dockerfile
+      args:
+        - NODE_ENV=production
+    ports:
+      - "3000:3000"
+    environment:
+      - NODE_ENV=production
+      - REACT_APP_API_URL=http://report-backend:5000/api
+      - REACT_APP_AWS_REGION=ap-northeast-1
+    deploy:
+      resources:
+        limits:
+          memory: 2G
+          cpus: '1'
+        reservations:
+          memory: 1G
+          cpus: '0.5'
+    restart: unless-stopped
+    volumes:
+      - ../../frontend:/app
+      - /app/node_modules
+    depends_on:
+      - backend
+
+  # 后端应用
+  backend:
+    container_name: report-backend
+    build:
+      context: ../../backend
+      dockerfile: Dockerfile
+    ports:
+      - "5000:5000"
+    # 明确指定使用gunicorn启动应用，使用app:create_app()
+    command: ["gunicorn", "--bind", "0.0.0.0:5000", "--workers", "1", "--threads", "2", "--timeout", "120", "app:create_app()"]
+    # 内存配置
+    deploy:
+      resources:
+        limits:
+          memory: 6G
+          cpus: '2'
+        reservations:
+          memory: 4G
+          cpus: '1'
+    # 重启策略
+    restart: unless-stopped
+    # 系统限制
+    ulimits:
+      nofile:
+        soft: 65536
+        hard: 65536
+    # 共享内存设置
+    shm_size: 4gb
+    environment:
+      # 移除FLASK_APP和FLASK_ENV环境变量，使用Dockerfile中的启动命令
+      # AWS区域设置
+      - AWS_REGION=ap-northeast-1
+      - AWS_DEFAULT_REGION=ap-northeast-1
+      # AWS SDK配置
+      - AWS_SDK_LOAD_CONFIG=1
+      # 应用配置
+      - S3_BUCKET_NAME=${S3_BUCKET_NAME}
+      - DYNAMODB_FILES_TABLE=${DYNAMODB_FILES_TABLE}
+      - DYNAMODB_REPORTS_TABLE=${DYNAMODB_REPORTS_TABLE}
+      - DYNAMODB_MODELS_TABLE=${DYNAMODB_MODELS_TABLE}
+      # Bedrock配置
+      - BEDROCK_ENDPOINT=https://bedrock-runtime.ap-northeast-1.amazonaws.com
+      - BEDROCK_MODEL_ID=anthropic.claude-3-sonnet-20240229-v1:0
+      # Bedrock Agent配置
+      - BEDROCK_AGENT_ID=LPJVAYJAK2
+      - BEDROCK_AGENT_ALIAS_ID=TSTALIASID
+      - BEDROCK_AGENT_ROLE_ARN=arn:aws:iam::458532992416:role/service-role/AmazonBedrockExecutionRoleForAgents_O2BTFX8UW9F
+      - BEDROCK_AGENT_ARN=arn:aws:bedrock:ap-northeast-1:458532992416:agent/LPJVAYJAK2
+      # 内存优化环境变量
+      - MALLOC_ARENA_MAX=2
+      - PYTHONMALLOC=malloc
+      - PYTHONHASHSEED=0
+      - PYTHONDISABLE_IMPORTLIB_METADATA_FINDER=1
+      - PYTHONgc__threshold=700
+      - PYTHONUNBUFFERED=1
+      - PYTHONDONTWRITEBYTECODE=1
+    volumes:
+      - ../../backend:/app
+      # 使用Windows路径挂载AWS凭证目录
+      - C:/Users/${USERNAME}/.aws:/root/.aws:ro
+
+networks:
+  default:
+    name: report-network 
